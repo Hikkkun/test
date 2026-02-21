@@ -2,7 +2,7 @@
   "id": "senkuro",
   "name": "Senkuro",
   "baseUrl": "https://api.senkuro.me/graphql",
-  "basePublicUrl": "https://senkuro.me",
+  "apiBaseUrl": "https://senkuro.me",
   "lang": "ru",
   "type": "MANGA",
   "headers": {
@@ -158,3 +158,4 @@
     }
   }
 }
+
