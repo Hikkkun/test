@@ -1,0 +1,129 @@
+{
+  "metadata": {
+    "id": "mangalib",
+    "name": "MangaLib",
+    "lang": "RU",
+    "version": 1,
+    "baseUrl": "https://mangalib.me",
+    "apiBaseUrl": "https://api.cdnlibs.org",
+    "iconUrl": "https://mangalib.me/static/images/logo/ml/favicon.ico",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/121.0.0.0 Safari/537.36",
+      "Referer": "https://mangalib.me/",
+      "Site-Id": "1"
+    }
+  },
+  "commands": {
+    "catalog": {
+      "request": {
+        "url": "{{apiBaseUrl}}/api/manga?fields[]=rate&fields[]=rate_avg&fields[]=userBookmark&site_id[]=1&page={{page}}",
+        "method": "GET",
+        "pagination": {
+          "page": {
+            "paramName": "page",
+            "start": 1,
+            "extract": {
+              "type": "json",
+              "path": "$.meta.has_next_page"
+            }
+          }
+        }
+      },
+      "extract": {
+        "type": "json",
+        "selector": "$.data",
+        "itemSelectors": {
+          "title": { "path": "$.rus_name" },
+          "uniq": { "path": "$.slug_url" },
+          "cover": { "path": "$.cover.default" },
+          "publicUrl": { "path": "$.slug_url", "format": "{{baseUrl}}/ru/{{val}}" }
+        }
+      }
+    },
+    "search": {
+      "request": {
+        "url": "{{apiBaseUrl}}/api/manga?fields[]=rate&fields[]=rate_avg&fields[]=userBookmark&site_id[]=1&q={{query}}&page={{page}}",
+        "method": "GET"
+      },
+      "extract": {
+        "type": "json",
+        "selector": "$.data",
+        "itemSelectors": {
+          "title": { "path": "$.rus_name" },
+          "uniq": { "path": "$.slug_url" },
+          "cover": { "path": "$.cover.default" },
+          "publicUrl": { "path": "$.slug_url", "format": "{{baseUrl}}/ru/{{val}}" }
+        }
+      }
+    },
+    "details": {
+      "request": {
+        "url": "{{apiBaseUrl}}/api/manga/{{uniq}}?fields[]=background&fields[]=eng_name&fields[]=otherNames&fields[]=summary&fields[]=releaseDate&fields[]=type_id&fields[]=caution&fields[]=views&fields[]=close_view&fields[]=rate_avg&fields[]=rate&fields[]=genres&fields[]=tags&fields[]=teams&fields[]=user&fields[]=franchise&fields[]=authors&fields[]=publisher&fields[]=userRating&fields[]=moderated&fields[]=metadata&fields[]=metadata.count&fields[]=metadata.close_comments&fields[]=manga_status_id&fields[]=chap_count&fields[]=status_id&fields[]=artists&fields[]=format&site_id[]=1"
+      },
+      "extract": {
+        "type": "json",
+        "itemSelectors": {
+          "title": { "path": "$.data.rus_name" },
+          "altTitle": { "path": "$.data.eng_name" },
+          "uniq": { "path": "$.data.slug_url" },
+          "description": { "path": "$.data.summary",
+            "replacements": [
+              { "find": "\n", "replace": "" }
+            ]
+          },
+          "cover": { "path": "$.data.cover.default" },
+          "author": { "path": "$.data.authors[*].name" },
+          "artist": { "path": "$.data.artists[*].name" },
+          "status": {
+            "path": "$.data.status.label",
+            "mapping": {
+              "онгоинг": "ONGOING",
+              "завершён": "COMPLETED",
+              "заморожен": "FROZEN",
+              "анонс": "ANNOUNCED"
+            }
+          },
+          "genres": { "path": "$.data.genres[*].name" },
+          "tags": { "path": "$.data.tags[*].name" }
+        }
+      }
+    },
+    "chapters": {
+      "request": {
+        "url": "{{apiBaseUrl}}/api/manga/{{uniq}}/chapters"
+      },
+      "extract": {
+        "type": "json",
+        "selector": "$.data",
+        "itemSelectors": {
+          "uniq": { "path": "$.id" },
+          "name": { "path": "$.name" },
+          "volume": { "path": "$.volume" },
+          "number": { "path": "$.number" },
+          "date": { "path": "$.created_at" },
+          "isPaid": { "path": "$.restricted_view.is_open" },
+          "publicUrl": {
+            "format": "{{baseUrl}}/ru/{{slug}}/read/v{{volume}}/c{{number}}",
+            "context": {
+              "slug": "{{uniq}}",
+              "volume": "{{volume}}",
+              "number": "{{number}}"
+            }
+          }
+        }
+      }
+    },
+    "pages": {
+      "request": {
+        "url": "{{apiBaseUrl}}/api/manga/{{manga_uniq}}/chapter?number={{number}}&volume={{volume}}&site_id[]=1"
+      },
+      "extract": {
+        "type": "json",
+        "selector": "$.data.pages",
+        "itemSelectors": {
+          "image": { "path": "$.url" }
+        }
+      }
+    }
+  }
+}

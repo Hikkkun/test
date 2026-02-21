@@ -1,0 +1,91 @@
+{
+  "id": "remanga",
+  "name": "Remanga",
+  "baseUrl": "https://api.remanga.org",
+  "lang": "ru",
+  "type": "MANGA",
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/121.0.0.0 Safari/537.36",
+    "Referer": "https://remanga.org/"
+  },
+  "commands": {
+    "catalog": {
+      "url": "{baseUrl}/api/v2/search/catalog/?count=30&ordering=-score&page={page}",
+      "pageStep": 1,
+      "nextPageSelector": { "query": "next", "type": "json" },
+      "selector": "results",
+      "itemSelectors": {
+        "title": { "query": "main_name", "type": "json" },
+        "uniq": { "query": "dir", "type": "json" },
+        "publicUrl": { "format": "https://remanga.org/manga/{uniq}" },
+        "cover": { "query": "cover.low", "type": "json", "format": "https://remanga.org{val}" }
+      }
+    },
+    "search": {
+      "url": "{baseUrl}/api/v2/search/?query={query}&count=30&page={page}",
+      "pageStep": 1,
+      "selector": "results",
+      "itemSelectors": {
+        "title": { "query": "main_name", "type": "json" },
+        "uniq": { "query": "dir", "type": "json" },
+        "publicUrl": { "format": "https://remanga.org/manga/{uniq}" },
+        "cover": { "query": "cover.low", "type": "json", "format": "https://remanga.org{val}" }
+      }
+    },
+    "details": {
+      "url": "{baseUrl}/api/titles/{slug}/",
+      "selector": "content",
+      "itemSelectors": {
+        "title": { "query": "rus_name", "type": "json" },
+        "altTitle": { "query": "another_name", "type": "json" },
+        "description": { "query": "description", "type": "json" },
+        "cover": { "query": "img.low", "type": "json", "format": "https://remanga.org{val}" },
+        "author": { "query": "creators.name", "type": "json" },
+        "artist": { "query": "publishers.name", "type": "json" },
+        "genre": { "query": "genres.name", "type": "json" },
+        "tags": { "query": "categories.name", "type": "json" },
+        "status": {
+          "query": "status.id",
+          "type": "json",
+          "mapping": {
+            "0": "1",
+            "1": "2",
+            "2": "3",
+            "3": "4"
+          }
+        },
+        "publicUrl": { "format": "https://remanga.org/manga/{slug}" },
+        "context": {
+          "branch_id": { "query": "branches.0.id", "type": "json" }
+        }
+      }
+    },
+    "chapters": {
+      "url": "{baseUrl}/api/v2/titles/chapters/?branch_id={branch_id}&ordering=index&page={page}&count=25",
+      "selector": "results",
+      "nextPageSelector": { "query": "next", "type": "json" },
+      "itemSelectors": {
+        "uniq": { "query": "id", "type": "json" },
+        "title": { "query": "name", "type": "json" },
+        "volume": { "query": "tome", "type": "json" },
+        "number": { "query": "chapter", "type": "json" },
+        "date": { "query": "upload_date", "type": "json" },
+        "isPaid": { "query": "is_paid", "type": "json" },
+        "publicUrl": {
+          "format": "https://remanga.org/manga/{slug}/ch{number}"
+        }
+      }
+    },
+    "pages": {
+      "url": "{baseUrl}/api/titles/chapters/{uniq}/",
+      "method": "GET",
+      "selector": "content.pages",
+      "itemSelectors": {
+        "image": {
+          "query": "link",
+          "type": "json"
+        }
+      }
+    }
+  }
+}

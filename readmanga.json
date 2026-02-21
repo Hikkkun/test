@@ -1,0 +1,103 @@
+{
+  "id": "readmanga",
+  "name": "ReadManga",
+  "baseUrl": "https://3.readmanga.ru",
+  "lang": "ru",
+  "type": "MANGA",
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Referer": "https://3.readmanga.ru/"
+  },
+  "commands": {
+    "catalog": {
+      "url": "{baseUrl}/list?sortType=RATING&offset={offset}",
+      "pageStep": 50,
+      "pageStart": 1,
+      "nextPageSelector": { "query": "a.nextLink", "type": "css" },
+      "selector": "div.tile",
+      "itemSelectors": {
+        "title": { "query": "div.desc h3 a", "type": "css" },
+        "uniq": { "query": "div.desc h3 a", "type": "css", "attr": "href", "regex": "/([^/]+)$" },
+        "cover": { "query": "div.img img", "type": "css", "attr": "data-original" },
+        "publicUrl": { "format": "{baseUrl}/{slug}" }
+      }
+    },
+    "search": {
+      "url": "{baseUrl}/search?q={query}&offset={offset}",
+      "pageStep": 50,
+      "pageStart": 1,
+      "nextPageSelector": { "query": "a.nextLink", "type": "css" },
+      "selector": "div.tile",
+      "itemSelectors": {
+        "title": { "query": "div.desc h3 a", "type": "css" },
+        "uniq": { "query": "div.desc h3 a", "type": "css", "attr": "href", "regex": "/([^/]+)$" },
+        "cover": { "query": "div.img img", "type": "css", "attr": "data-original" },
+        "publicUrl": { "format": "{baseUrl}/{slug}" }
+      }
+    },
+    "details": {
+      "url": "{baseUrl}/{slug}",
+      "selector": "body",
+      "itemSelectors": {
+        "title": { "query": "h1.names span.name", "type": "css" },
+        "altTitle": { "query": "div.another-names", "type": "css" },
+        "description": { "query": "div.manga-description p", "type": "css" },
+        "cover": { "query": "div.picture-fotorama img:first-child", "type": "css", "attr": "src" },
+        "author": { "query": "span.elem_screenwriter a", "type": "css" },
+        "artist": { "query": "span.elem_illustrator a", "type": "css" },
+        "translator": { "query": "span.elem_translator a", "type": "css" },
+        "genre": { "query": "a.elem_genre", "type": "css" },
+        "tags": { "query": "a.elem_tag", "type": "css" },
+        "status": {
+          "query": "div.subject-meta p",
+          "type": "css",
+          "mapping": {
+            "продолжается": 1,
+            "завершен": 2,
+            "завершён": 2,
+            "заморожен": 3,
+            "анонс": 4
+          }
+        },
+        "publicUrl": { "format": "{baseUrl}/{slug}" }
+      }
+    },
+    "chapters": {
+      "url": "{baseUrl}/{slug}",
+      "selector": "table.table tbody tr:not(:has(th))",
+      "itemSelectors": {
+        "uniq": { "query": "a", "type": "css", "attr": "href" },
+        "title": { "query": "a", "type": "css" },
+
+        "volume": {
+          "query": "a",
+          "type": "css",
+          "attr": "href",
+          "regex": "vol(\\d+)"
+        },
+        "number": {
+          "query": "a",
+          "type": "css",
+          "attr": "href",
+          "regex": "vol\\d+/(\\d+(\\.\\d+)?)"
+        },
+        "date": { "query": "td.date", "type": "css" },
+        "context": {
+          "volume": { "query": "a", "type": "css", "attr": "href", "regex": "vol(\\d+)" },
+          "number": { "query": "a", "type": "css", "attr": "href", "regex": "vol\\d+/(\\d+(\\.\\d+)?)" }
+        },
+        "publicUrl": { "format": "{baseUrl}{uniq}" }
+      }
+    },
+    "pages": {
+      "url": "{baseUrl}{uniq}",
+      "method": "GET",
+      "itemSelectors": {
+        "image": {
+          "regex": "\\['(https?:\\/\\/[^']+)','',\"([^\"?]+)",
+          "format": "$1$2"
+        }
+      }
+    }
+  }
+}

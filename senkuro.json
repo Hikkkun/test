@@ -1,0 +1,159 @@
+{
+  "id": "senkuro",
+  "name": "Senkuro",
+  "baseUrl": "https://api.senkuro.me/graphql",
+  "lang": "ru",
+  "type": "MANGA",
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Content-Type": "application/json",
+    "Origin": "https://senkuro.com",
+    "Referer": "https://senkuro.com/"
+  },
+  "commands": {
+    "catalog": {
+      "url": "{baseUrl}",
+      "method": "POST",
+      "body": "{\"query\":\"query fetchMangas($after: String) { mangas(first: 20, after: $after, orderBy: {field: POPULARITY_SCORE, direction: DESC}) { edges { node { slug titles { lang content } cover { original { url } } } } pageInfo { hasNextPage endCursor } } }\",\"variables\":{\"after\":{after}}}",
+      "selector": "data.mangas.edges",
+      "nextPageSelector": {
+        "query": "data.mangas.pageInfo.endCursor",
+        "type": "json"
+      },
+      "itemSelectors": {
+        "title": {
+          "query": "node.titles[lang=RU].content",
+          "type": "json"
+        },
+        "uniq": {
+          "query": "node.slug",
+          "type": "json"
+        },
+        "cover": {
+          "query": "node.cover.original.url",
+          "type": "json"
+        },
+        "publicUrl": {
+          "query": "node.slug",
+          "type": "json",
+          "format": "https://senkuro.me/manga/{val}"
+        }
+      }
+    },
+    "search": {
+      "url": "{baseUrl}",
+      "method": "POST",
+      "body": "{\"query\": \"query searchTachiyomiManga($query: String) { mangaTachiyomiSearch(query: $query) { mangas { slug titles { lang content } cover { original { url } } } } }\", \"variables\": { \"query\": \"{query}\" } }",
+      "selector": "data.mangaTachiyomiSearch.mangas",
+      "itemSelectors": {
+        "title": {
+          "query": "titles.0.content",
+          "type": "json"
+        },
+        "uniq": {
+          "query": "slug",
+          "type": "json"
+        },
+        "cover": {
+          "query": "cover.original.url",
+          "type": "json"
+        },
+        "publicUrl": {
+          "query": "slug",
+          "type": "json",
+          "format": "https://senkuro.me/manga/{val}"
+        }
+      }
+    },
+    "details": {
+      "url": "{baseUrl}",
+      "method": "POST",
+      "body": "{\"query\":\"query fetchManga($slug: String!) { manga(slug: $slug) { slug titles { lang content } cover { original { url } } labels { titles { content lang } } status branches { id } localizations { description { ... on TiptapNodeNestedBlock { content { ... on TiptapNodeText { text } } } } } } }\",\"variables\":{\"slug\":\"{slug}\"}}",
+      "selector": "data.manga",
+      "itemSelectors": {
+        "title": {
+          "query": "titles[lang=RU].content",
+          "type": "json"
+        },
+        "altTitle": {
+          "query": "alternativeNames.content",
+          "type": "json"
+        },
+        "cover": {
+          "query": "cover.original.url",
+          "type": "json"
+        },
+        "description": {
+          "query": "localizations[lang=RU].description.content.text",
+          "type": "json"
+        },
+        "tags": {
+          "query": "labels.titles[lang=RU].content",
+          "type": "json"
+        },
+        "status": {
+          "query": "status",
+          "type": "json",
+          "mapping": {
+            "ONGOING": "1",
+            "FINISHED": "2",
+            "ANNOUNCEMENT": "4",
+            "FROZEN": "3"
+          }
+        },
+        "publicUrl": {
+          "format": "https://senkuro.me/manga/{slug}"
+        },
+        "context": {
+          "branch_id": {
+            "query": "branches.0.id",
+            "type": "json"
+          }
+        }
+      }
+    },
+    "chapters": {
+      "url": "{baseUrl}",
+      "method": "POST",
+      "body": "{\"query\": \"query fetchMangaChapters($branchId: ID!, $after: String) { mangaChapters(first: 100, branchId: $branchId, after: $after) { edges { node { slug name number volume } } pageInfo { hasNextPage endCursor } } }\", \"variables\": { \"branchId\": \"{branch_id}\", \"after\": {after} } }",
+      "selector": "data.mangaChapters.edges",
+      "nextPageSelector": {
+        "query": "data.mangaChapters.pageInfo.endCursor",
+        "type": "json"
+      },
+      "itemSelectors": {
+        "uniq": {
+          "query": "node.slug",
+          "type": "json"
+        },
+        "title": {
+          "query": "node.name",
+          "type": "json"
+        },
+        "volume": {
+          "query": "node.volume",
+          "type": "json"
+        },
+        "number": {
+          "query": "node.number",
+          "type": "json"
+        },
+        "publicUrl": {
+          "format": "https://senkuro.me/manga/{slug}/chapter/{uniq}"
+        }
+      }
+    },
+    "pages": {
+      "url": "{baseUrl}",
+      "method": "POST",
+      "body": "{\"query\": \"query fetchMangaChapter($slug: String!) { mangaChapter(slug: $slug) { pages { image { original { url } } } } }\", \"variables\": { \"slug\": \"{uniq}\" } }",
+      "selector": "data.mangaChapter.pages",
+      "itemSelectors": {
+        "image": {
+          "query": "image.original.url",
+          "type": "json"
+        }
+      }
+    }
+  }
+}
