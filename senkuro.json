@@ -1,9 +1,8 @@
 {
   "id": "senkuro",
   "name": "Senkuro",
-  "baseUrl": "https://api.senkuro.me/graphql",
-  "apiBaseUrl": "https://senkuro.me",
-  "lang": "ru",
+  "baseUrl": "https://senkuro.me",
+  "apiBaseUrl": "https://api.senkuro.me/graphqle",
   "type": "MANGA",
   "headers": {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -13,7 +12,7 @@
   },
   "commands": {
     "catalog": {
-      "url": "{baseUrl}",
+      "url": "{{apiBaseUrl}}",
       "method": "POST",
       "body": "{\"query\":\"query fetchMangas($after: String) { mangas(first: 20, after: $after, orderBy: {field: POPULARITY_SCORE, direction: DESC}) { edges { node { slug titles { lang content } cover { original { url } } } } pageInfo { hasNextPage endCursor } } }\",\"variables\":{\"after\":{after}}}",
       "selector": "data.mangas.edges",
@@ -37,12 +36,12 @@
         "publicUrl": {
           "query": "node.slug",
           "type": "json",
-          "format": "{basePublicUrl}/manga/{val}"
+          "format": "{{baseUrl}}/manga/{{uniq}}"
         }
       }
     },
     "search": {
-      "url": "{baseUrl}",
+      "url": "{{apiBaseUrl}}",
       "method": "POST",
       "body": "{\"query\": \"query searchTachiyomiManga($query: String) { mangaTachiyomiSearch(query: $query) { mangas { slug titles { lang content } cover { original { url } } } } }\", \"variables\": { \"query\": \"{query}\" } }",
       "selector": "data.mangaTachiyomiSearch.mangas",
@@ -62,12 +61,12 @@
         "publicUrl": {
           "query": "slug",
           "type": "json",
-          "format": "{basePublicUrl}/manga/{val}"
+          "format": "{{baseUrl}}/manga/{{uniq}}"
         }
       }
     },
     "details": {
-      "url": "{baseUrl}",
+      "url": "{{apiBaseUrl}}",
       "method": "POST",
       "body": "{\"query\":\"query fetchManga($slug: String!) { manga(slug: $slug) { slug titles { lang content } cover { original { url } } labels { titles { content lang } } status branches { id } localizations { description { ... on TiptapNodeNestedBlock { content { ... on TiptapNodeText { text } } } } } } }\",\"variables\":{\"slug\":\"{slug}\"}}",
       "selector": "data.manga",
@@ -103,7 +102,7 @@
           }
         },
         "publicUrl": {
-          "format": "{basePublicUrl}/manga/{slug}"
+          "format": "{{baseUrl}}/manga/{{slug}}"
         },
         "context": {
           "branch_id": {
@@ -114,7 +113,7 @@
       }
     },
     "chapters": {
-      "url": "{baseUrl}",
+      "url": "{{apiBaseUrl}}",
       "method": "POST",
       "body": "{\"query\": \"query fetchMangaChapters($branchId: ID!, $after: String) { mangaChapters(first: 100, branchId: $branchId, after: $after) { edges { node { slug name number volume } } pageInfo { hasNextPage endCursor } } }\", \"variables\": { \"branchId\": \"{branch_id}\", \"after\": {after} } }",
       "selector": "data.mangaChapters.edges",
@@ -140,12 +139,12 @@
           "type": "json"
         },
         "publicUrl": {
-          "format": "{basePublicUrl}a/{slug}/chapter/{uniq}"
+          "format": "{{baseUrl}}/{{slug}}/chapter/{{uniq}}"
         }
       }
     },
     "pages": {
-      "url": "{baseUrl}",
+      "url": "{{apiBaseUrl}}",
       "method": "POST",
       "body": "{\"query\": \"query fetchMangaChapter($slug: String!) { mangaChapter(slug: $slug) { pages { image { original { url } } } } }\", \"variables\": { \"slug\": \"{uniq}\" } }",
       "selector": "data.mangaChapter.pages",
@@ -158,4 +157,3 @@
     }
   }
 }
-
