@@ -2,6 +2,7 @@
   "id": "senkuro",
   "name": "Senkuro",
   "baseUrl": "https://api.senkuro.me/graphql",
+  "basePublicUrl": "https://senkuro.me",
   "lang": "ru",
   "type": "MANGA",
   "headers": {
@@ -36,7 +37,7 @@
         "publicUrl": {
           "query": "node.slug",
           "type": "json",
-          "format": "https://senkuro.me/manga/{val}"
+          "format": "{basePublicUrl}/manga/{val}"
         }
       }
     },
@@ -61,7 +62,7 @@
         "publicUrl": {
           "query": "slug",
           "type": "json",
-          "format": "https://senkuro.me/manga/{val}"
+          "format": "{basePublicUrl}/manga/{val}"
         }
       }
     },
@@ -102,7 +103,7 @@
           }
         },
         "publicUrl": {
-          "format": "https://senkuro.me/manga/{slug}"
+          "format": "{basePublicUrl}/manga/{slug}"
         },
         "context": {
           "branch_id": {
@@ -139,7 +140,7 @@
           "type": "json"
         },
         "publicUrl": {
-          "format": "https://senkuro.me/manga/{slug}/chapter/{uniq}"
+          "format": "{basePublicUrl}a/{slug}/chapter/{uniq}"
         }
       }
     },
